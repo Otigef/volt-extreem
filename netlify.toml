@@ -1,0 +1,26 @@
+[build]
+  command = "pnpm install && pnpm run build:client"
+  functions = "netlify/functions"
+  publish = "dist/spa"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_VERSION = "10.14.0"
+
+[functions]
+  external_node_modules = ["express", "cors", "nodemailer", "dotenv"]
+  node_bundler = "esbuild"
+  included_files = ["server/**/*", "shared/**/*"]
+  
+# API routes - redirect to serverless function (must come first)
+[[redirects]]
+  force = true
+  from = "/api/*"
+  status = 200
+  to = "/.netlify/functions/api/:splat"
+
+# SPA fallback - serve index.html for all other routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
